@@ -1,0 +1,47 @@
+# Coolify-compatible Docker Compose that builds from source
+# This configuration builds from your GitHub repository
+
+name: anythingllm-coolify
+
+networks:
+  anything-llm:
+    driver: bridge
+
+volumes:
+  anythingllm_storage:
+    driver: local
+  anythingllm_hotdir:
+    driver: local
+  anythingllm_outputs:
+    driver: local
+
+services:
+  anything-llm:
+    # Let Coolify manage container naming
+    build:
+      context: https://github.com/kivilaid/anything-llm.git#master
+      dockerfile: docker/Dockerfile
+      args:
+        ARG_UID: 1000
+        ARG_GID: 1000
+    volumes:
+      - anythingllm_storage:/app/server/storage
+      - anythingllm_hotdir:/app/collector/hotdir
+      - anythingllm_outputs:/app/collector/outputs
+    environment:
+      - STORAGE_DIR=/app/server/storage
+      - VECTOR_DB=lancedb
+      - DISABLE_TELEMETRY=true
+    networks:
+      - anything-llm
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - '-f'
+        - 'http://localhost:3001/api/ping'
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

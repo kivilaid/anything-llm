@@ -1,6 +1,6 @@
 # Coolify-compatible Docker Compose configuration
-# This uses the pre-built Docker Hub image to avoid build context issues
-# For building from source, use Coolify's Dockerfile deployment method instead
+# This builds from your GitHub repository
+# Container naming is managed by Coolify to avoid conflicts
 
 name: anythingllm-coolify
 
@@ -18,9 +18,13 @@ volumes:
 
 services:
   anything-llm:
-    container_name: anythingllm
-    image: mintplexlabs/anythingllm:latest
-    # Removed build section - use pre-built image for Coolify compatibility
+    # Let Coolify manage container naming
+    build:
+      context: https://github.com/kivilaid/anything-llm.git#master
+      dockerfile: docker/Dockerfile
+      args:
+        ARG_UID: 1000
+        ARG_GID: 1000
     # Removed cap_add SYS_ADMIN - not needed and causes issues with Coolify
     volumes:
       # Using named volumes instead of host paths for Coolify compatibility
