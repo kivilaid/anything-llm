@@ -8,19 +8,20 @@ This guide helps you deploy AnythingLLM on Coolify, addressing common issues tha
 - Access to Coolify's dashboard
 - An LLM provider API key (OpenAI, Anthropic, Ollama, etc.)
 
-## Deployment Steps
+## Deployment Methods
 
-### 1. Create a New Service in Coolify
+### Method 1: Docker Compose (Recommended)
+
+#### 1. Create a New Service in Coolify
 
 1. Log into your Coolify dashboard
 2. Navigate to your project/environment
 3. Click "Add Resource" → "Docker Compose"
 4. Name your service (e.g., "anythingllm")
 
-### 2. Configure the Docker Compose
+#### 2. Configure the Docker Compose
 
-1. In the Docker Compose configuration, use the contents from `docker/docker-compose.coolify.yml`
-2. Or copy and paste this configuration:
+Use the official Docker Hub image (no building required):
 
 ```yaml
 name: anythingllm-coolify
@@ -40,9 +41,7 @@ volumes:
 services:
   anything-llm:
     container_name: anythingllm
-    build:
-      context: https://github.com/Mintplex-Labs/anything-llm.git#master:docker
-      dockerfile: ./Dockerfile
+    image: mintplexlabs/anythingllm:latest
     volumes:
       - anythingllm_storage:/app/server/storage
       - anythingllm_hotdir:/app/collector/hotdir
@@ -65,7 +64,7 @@ services:
       start_period: 40s
 ```
 
-### 3. Configure Environment Variables
+#### 3. Configure Environment Variables
 
 In Coolify's environment variables section, add the following REQUIRED variables:
 
@@ -140,6 +139,39 @@ EMBEDDING_MODEL_PREF=text-embedding-ada-002
 Once deployed:
 - Access AnythingLLM at: `https://your-coolify-domain:3001`
 - Or use the URL provided by Coolify if you've configured a custom domain
+
+### Method 2: Dockerfile Build (For Custom Forks)
+
+If you need to build from your fork with custom modifications:
+
+#### 1. Create a New Service
+
+1. In Coolify, click "Add Resource" → "Public Repository"
+2. Enter your fork URL: `https://github.com/YOUR_USERNAME/anything-llm`
+3. Select branch: `master` (or your branch)
+
+#### 2. Configure Build Settings
+
+1. **Build Pack**: Select "Dockerfile"
+2. **Base Directory**: `/docker`
+3. **Dockerfile Location**: `./Dockerfile`
+4. **Port**: `3001`
+
+#### 3. Add Build Arguments
+
+In the build arguments section:
+```
+ARG_UID=1000
+ARG_GID=1000
+```
+
+#### 4. Configure Environment Variables
+
+Add the same environment variables as Method 1 (see above).
+
+#### 5. Deploy
+
+Click "Deploy" and monitor the build logs.
 
 ## Troubleshooting
 
