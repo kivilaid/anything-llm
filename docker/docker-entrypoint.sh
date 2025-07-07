@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Copy .env.docker to .env if .env doesn't exist
+if [ ! -f /app/server/.env ]; then
+    echo "No .env file found. Creating from .env.docker template..."
+    cp /app/server/.env.docker /app/server/.env
+fi
+
 # Check if STORAGE_DIR is set
 if [ -z "$STORAGE_DIR" ]; then
     echo "================================================================"
