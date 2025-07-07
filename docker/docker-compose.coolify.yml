@@ -1,3 +1,7 @@
+# Coolify-compatible Docker Compose configuration
+# This uses the pre-built Docker Hub image to avoid build context issues
+# For building from source, use Coolify's Dockerfile deployment method instead
+
 name: anythingllm-coolify
 
 networks:
@@ -15,9 +19,8 @@ volumes:
 services:
   anything-llm:
     container_name: anythingllm
-    build:
-      context: ..
-      dockerfile: ./docker/Dockerfile
+    image: mintplexlabs/anythingllm:latest
+    # Removed build section - use pre-built image for Coolify compatibility
     # Removed cap_add SYS_ADMIN - not needed and causes issues with Coolify
     volumes:
       # Using named volumes instead of host paths for Coolify compatibility

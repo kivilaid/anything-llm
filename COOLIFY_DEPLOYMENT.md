@@ -21,6 +21,10 @@ This guide helps you deploy AnythingLLM on Coolify, addressing common issues tha
 
 #### 2. Configure the Docker Compose
 
+**Important**: Make sure to set the compose file path correctly in Coolify:
+- **Compose File**: `docker-compose.coolify.yml` (in repository root)
+- OR use `docker/docker-compose.coolify.yml` if you prefer
+
 Use the official Docker Hub image (no building required):
 
 ```yaml
@@ -177,23 +181,28 @@ Click "Deploy" and monitor the build logs.
 
 ### Common Issues and Solutions
 
-#### 1. Container Fails to Start
+#### 1. "resolve : lstat /artifacts/docker: no such file or directory"
+- **Issue**: Coolify can't find the Docker build context
+- **Solution**: Use the pre-built image configuration (no build section in compose file)
+- **Alternative**: Use `docker-compose.coolify.yml` from repository root
+
+#### 2. Container Fails to Start
 - **Check logs**: Look for missing environment variables
 - **Solution**: Ensure all REQUIRED environment variables are set
 
-#### 2. "SYS_ADMIN capability" Error
+#### 3. "SYS_ADMIN capability" Error
 - **Issue**: The Coolify-specific compose file removes this capability
 - **Solution**: Use `docker-compose.coolify.yml` instead of the standard compose file
 
-#### 3. Permission Errors
+#### 4. Permission Errors
 - **Issue**: User permission conflicts
 - **Solution**: The Coolify configuration removes user directives to let Coolify handle permissions
 
-#### 4. Data Loss on Restart
+#### 5. Data Loss on Restart
 - **Issue**: Volumes not properly configured
 - **Solution**: Ensure named volumes are used (as in the Coolify compose file)
 
-#### 5. Cannot Connect to LLM
+#### 6. Cannot Connect to LLM
 - **Issue**: API keys or endpoints not properly set
 - **Solution**: Double-check your LLM provider configuration in environment variables
 

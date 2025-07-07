@@ -1,0 +1,57 @@
+# Coolify Docker Compose configuration
+# Place this file in your repository root for Coolify deployment
+# This configuration uses the official pre-built image
+
+name: anythingllm
+
+networks:
+  anything-llm:
+    driver: bridge
+
+volumes:
+  anythingllm_storage:
+    driver: local
+  anythingllm_hotdir:
+    driver: local
+  anythingllm_outputs:
+    driver: local
+
+services:
+  anythingllm:
+    image: mintplexlabs/anythingllm:latest
+    container_name: anythingllm
+    volumes:
+      - anythingllm_storage:/app/server/storage
+      - anythingllm_hotdir:/app/collector/hotdir
+      - anythingllm_outputs:/app/collector/outputs
+    ports:
+      - "${PORT:-3001}:3001"
+    environment:
+      # Core configuration
+      - SERVER_PORT=3001
+      - STORAGE_DIR=/app/server/storage
+      
+      # Security tokens - Set these in Coolify environment
+      - SIG_KEY=${SIG_KEY}
+      - SIG_SALT=${SIG_SALT}
+      - JWT_SECRET=${JWT_SECRET}
+      
+      # LLM Provider - Configure in Coolify environment
+      - LLM_PROVIDER=${LLM_PROVIDER:-openai}
+      - OPEN_AI_KEY=${OPEN_AI_KEY:-}
+      - OPEN_MODEL_PREF=${OPEN_MODEL_PREF:-gpt-4o}
+      
+      # Optional configurations
+      - VECTOR_DB=${VECTOR_DB:-lancedb}
+      - AUTH_TOKEN=${AUTH_TOKEN:-}
+      - DISABLE_TELEMETRY=${DISABLE_TELEMETRY:-true}
+      
+    restart: unless-stopped
+    networks:
+      - anything-llm
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
